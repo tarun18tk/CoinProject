@@ -1,14 +1,17 @@
 package com.project.coin.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.coin.dto.ApiResponse;
 import com.project.coin.dto.CoinDTO;
 import com.project.coin.entity.Coin;
 import com.project.coin.service.CoinService;
@@ -26,8 +29,8 @@ public class CoinController {
     }
 
     @GetMapping("/{name}")
-    public CoinDTO getCoinInfo(@PathVariable String name){
-        return coinService.getCoinByName(name);
+    public ResponseEntity<ApiResponse<CoinDTO>> getCoinInfo(@PathVariable String name){
+        return ResponseEntity.ok().body(ApiResponse.<CoinDTO>builder().success(true).message("Got the coin").data(coinService.getCoinByName(name)).timeStamp(LocalDateTime.now()).build());
     }
 
     @GetMapping("/allCoins")
@@ -45,9 +48,16 @@ public class CoinController {
         return res;
     }
 
+    //Mono responses
+
+    @GetMapping("/getOneCoin")
+    public Mono<ResponseEntity<ApiResponse<CoinDTO>>> getFromAPIMono(){
+        return coinService.getCoinDetails().map(data -> ResponseEntity.ok(ApiResponse.<CoinDTO>builder().success(true).data(data).message("Fetched one coin").build()));
+    }
+
     @GetMapping("/coinFromAPI")
-    public Mono<List<CoinDTO>> getFromAPI(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "2") int size){
-        return coinService.getAllCoins(page,size);
+    public Mono<ResponseEntity<ApiResponse<List<CoinDTO>>>> getFromAPI(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "2") int size){
+        return coinService.getAllCoins(page,size).map(response -> ResponseEntity.ok(ApiResponse.<List<CoinDTO>>builder().success(true).data(response).timeStamp(LocalDateTime.now()).build()));
     }
 
 }

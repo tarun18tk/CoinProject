@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,7 +20,7 @@ public class CoinService {
 
     @Autowired
     public WebClient client;
-
+    @Cacheable(value="coinsCache", key="'page_' + #page + '_size_' + #size")
     //trying to return all coins using pagination and size
     public Mono<List<CoinDTO>> getAllCoins(int page, int size){
         return client.get().uri("/coins").retrieve().bodyToMono(CoinResponse.class)
