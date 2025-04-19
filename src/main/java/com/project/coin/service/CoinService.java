@@ -20,6 +20,7 @@ public class CoinService {
 
     @Autowired
     public WebClient client;
+
     @Cacheable(value="coinsCache", key="'page_' + #page + '_size_' + #size")
     //trying to return all coins using pagination and size
     public Mono<List<CoinDTO>> getAllCoins(int page, int size){

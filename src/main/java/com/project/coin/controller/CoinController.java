@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import com.project.coin.dto.ApiResponse;
 import com.project.coin.dto.CoinDTO;
 import com.project.coin.entity.Coin;
 import com.project.coin.service.CoinService;
+import com.project.coin.service.TradeService;
 
 import reactor.core.publisher.Mono;
 
@@ -23,9 +26,11 @@ import reactor.core.publisher.Mono;
 public class CoinController {
 
     CoinService coinService;
+    TradeService tradeService;
 
-    public CoinController(CoinService coinService){
+    public CoinController(CoinService coinService, TradeService tradeService){
         this.coinService=coinService;
+        this.tradeService=tradeService;
     }
 
     @GetMapping("/{name}")
@@ -58,6 +63,21 @@ public class CoinController {
     @GetMapping("/coinFromAPI")
     public Mono<ResponseEntity<ApiResponse<List<CoinDTO>>>> getFromAPI(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "2") int size){
         return coinService.getAllCoins(page,size).map(response -> ResponseEntity.ok(ApiResponse.<List<CoinDTO>>builder().success(true).data(response).timeStamp(LocalDateTime.now()).build()));
+    }
+
+    @GetMapping("/trade")
+    public Mono<ResponseEntity<String>> tradingCoins(){
+        return tradeService.trade()
+            .map(response -> ResponseEntity.ok(response));
+        //logic to trade coins maybe
+        //and then lets call the other api to notify 
+        // return tradeService.tradeCoins().map(response -> ResponseEntity.ok().body(response));
+    }
+
+    @PostMapping("/addNewCoin")
+    public ResponseEntity<String> addedNewCoin(){
+        //some logic to add coin to our platform or something
+        return ResponseEntity.status(HttpStatus.OK).body("Some string");
     }
 
 }

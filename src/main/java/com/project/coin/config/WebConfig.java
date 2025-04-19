@@ -2,11 +2,13 @@ package com.project.coin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebConfig {
     
+    @Primary
     @Bean
     public WebClient webClientConfig(){
      return WebClient.builder()
@@ -16,5 +18,10 @@ public class WebConfig {
         // return WebClient.builder()
         //                 .baseUrl("http://localhost:9090/api/coins")
         //                 .build();
+    }
+
+    @Bean("notifyService")
+    public WebClient notifyService(){
+        return WebClient.builder().baseUrl("http://localhost:8080").build();
     }
 }
